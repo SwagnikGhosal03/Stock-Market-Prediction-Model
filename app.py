@@ -39,49 +39,6 @@ def compute_moving_averages(data):
     }
 
 ma_values = compute_moving_averages(data)
-
-
-#news API
-st.subheader("📰 Stock News & Sentiment Analysis")
-
-NEWS_API_KEY = "23a76dd2d6844e4a8d60b79e6ec2e3ca"
-
-def fetch_stock_news(stock):
-    NEWS_API_URL = f'https://newsapi.org/v2/everything?q={stock}&language=en&sortBy=publishedAt&apiKey=23a76dd2d6844e4a8d60b79e6ec2e3ca'
-    response = requests.get(NEWS_API_URL)
-    if response.status_code == 200:
-        return response.json().get("articles", [])
-    return []
-
-#sentiment score
-def analyze_sentiment(news_articles):
-    analyzer = SentimentIntensityAnalyzer()
-    sentiment_scores = []
-    for article in news_articles:
-        score = analyzer.polarity_scores(article["title"])["compound"]
-        sentiment_scores.append(score)
-    return sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0.0
-
-news_articles = fetch_stock_news(stock)
-sentiment_score = analyze_sentiment(news_articles)
-
-st.subheader("Latest News")
-if news_articles:
-    for article in news_articles[:7]: 
-        st.markdown(f"**[{article['title']}]({article['url']})**")
-else:
-    st.warning("No news found.")
-
-st.subheader("Sentiment Analysis")
-st.write(f"Sentiment Score: {sentiment_score:.2f}")
-
-if sentiment_score > 0.05:
-    st.success("Positive Sentiment 😊")
-elif sentiment_score < -0.05:
-    st.error("Negative Sentiment 😠")
-else:
-    st.warning("Neutral Sentiment 😐")
-
 def compute_macd(data):
     short_ema = data['Close'].ewm(span=12, adjust=False).mean()
     long_ema = data['Close'].ewm(span=26, adjust=False).mean()
@@ -456,3 +413,43 @@ ax3.plot(data['MACD'], label='MACD', color='blue')
 ax3.plot(data['Signal Line'], label='Signal Line', color='red')
 ax3.legend()
 st.pyplot(fig3)
+#news API
+st.subheader("📰 Stock News & Sentiment Analysis")
+
+NEWS_API_KEY = "23a76dd2d6844e4a8d60b79e6ec2e3ca"
+
+def fetch_stock_news(stock):
+    NEWS_API_URL = f'https://newsapi.org/v2/everything?q={stock}&language=en&sortBy=publishedAt&apiKey=23a76dd2d6844e4a8d60b79e6ec2e3ca'
+    response = requests.get(NEWS_API_URL)
+    if response.status_code == 200:
+        return response.json().get("articles", [])
+    return []
+
+#sentiment score
+def analyze_sentiment(news_articles):
+    analyzer = SentimentIntensityAnalyzer()
+    sentiment_scores = []
+    for article in news_articles:
+        score = analyzer.polarity_scores(article["title"])["compound"]
+        sentiment_scores.append(score)
+    return sum(sentiment_scores) / len(sentiment_scores) if sentiment_scores else 0.0
+
+news_articles = fetch_stock_news(stock)
+sentiment_score = analyze_sentiment(news_articles)
+
+st.subheader("Latest News")
+if news_articles:
+    for article in news_articles[:7]: 
+        st.markdown(f"**[{article['title']}]({article['url']})**")
+else:
+    st.warning("No news found.")
+
+st.subheader("Sentiment Analysis")
+st.write(f"Sentiment Score: {sentiment_score:.2f}")
+
+if sentiment_score > 0.05:
+    st.success("Positive Sentiment 😊")
+elif sentiment_score < -0.05:
+    st.error("Negative Sentiment 😠")
+else:
+    st.warning("Neutral Sentiment 😐")
